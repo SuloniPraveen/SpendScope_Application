@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SpendScope Analyzer – Upload Statement</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="page page-upload">
+  <div class="bg-gradient"></div>
+
+  <header class="app-header">
+    <div class="app-logo">Spend<span>Scope</span></div>
+    <div class="app-subtitle">Smart insights from your bank statements</div>
+  </header>
+
+  <main class="app-main">
+    <section class="card upload-card">
+      <h1>Bank Statement Insights</h1>
+      <p class="card-subtitle">
+        Upload a PDF bank statement and get analytics on your spending patterns,
+        inflows, and AI-driven recommendations.
+      </p>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-container">
+            {% for message in messages %}
+              <div class="flash flash-error">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form id="upload-form" class="upload-form" method="POST" action="{{ url_for('analyze') }}" enctype="multipart/form-data">
+        <label for="statement" class="file-label">
+          <div class="file-label-inner">
+            <div class="file-icon">📄</div>
+            <div>
+              <div class="file-label-title">Choose a PDF bank statement</div>
+              <div class="file-label-subtitle">Text-based PDFs from any bank work best.</div>
+              <div id="file-status" class="file-status">No file selected yet.</div>
+            </div>
+          </div>
+          <input type="file" name="statement" id="statement" accept="application/pdf" required />
+        </label>
+
+        <button type="submit" class="btn-primary">
+          Analyze Statement
+        </button>
+
+        <p class="helper-text">
+          Your data is processed only in this session to generate insights and is not stored by the app.
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-modal">
+      <div class="loading-spinner"></div>
+      <h2>Analyzing your statement…</h2>
+      <p class="loading-subtitle">
+        We’re reading your PDF, extracting transactions, and generating insights.
+      </p>
+
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+
+      <ol class="progress-steps">
+        <li class="step">
+          <span class="step-badge">1</span>
+          <span class="step-label">Uploading PDF</span>
+        </li>
+        <li class="step">
+          <span class="step-badge">2</span>
+          <span class="step-label">Extracting statement text</span>
+        </li>
+        <li class="step">
+          <span class="step-badge">3</span>
+          <span class="step-label">Parsing transactions with AI</span>
+        </li>
+        <li class="step">
+          <span class="step-badge">4</span>
+          <span class="step-label">Computing spend insights</span>
+        </li>
+        <li class="step">
+          <span class="step-badge">5</span>
+          <span class="step-label">Generating recommendations</span>
+        </li>
+      </ol>
+
+      <p class="loading-tip">
+        Larger PDFs with many transactions may take a little longer. Please don’t close this tab.
+      </p>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const form = document.getElementById('upload-form');
+    const overlay = document.getElementById('loading-overlay');
+    const steps = document.querySelectorAll('.progress-steps .step');
+    const progressFill = document.getElementById('progress-fill');
+    const fileInput = document.getElementById('statement');
+    const fileStatus = document.getElementById('file-status');
+    const loadingSubtitle = document.querySelector('.loading-subtitle');
+    const loadingTip = document.querySelector('.loading-tip');
+
+    // Show chosen filename + success
+    if (fileInput && fileStatus) {
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) {
+          fileStatus.textContent = `Selected: ${fileInput.files[0].name}`;
+          fileStatus.classList.add('file-status-success');
+        } else {
+          fileStatus.textContent = 'No file selected yet.';
+          fileStatus.classList.remove('file-status-success');
+        }
+      });
+    }
+
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+      // let browser do required-field validation
+      if (!form.checkValidity()) {
+        return;
+      }
+
+      // we want to show all stages before actually sending the POST
+      e.preventDefault();
+
+      overlay.classList.add('show');
+
+      const totalSteps = steps.length;
+      let current = 0;
+
+      if (totalSteps === 0) {
+        form.submit();
+        return;
+      }
+
+      // reset step states
+      steps.forEach(step => step.classList.remove('active', 'done'));
+      steps[0].classList.add('active');
+      progressFill.style.width = `${(1 / totalSteps) * 100}%`;
+
+      // slower ticks between stages
+      const stepDuration = 1500; // ms per stage
+
+      const interval = setInterval(() => {
+        if (current < totalSteps) {
+          // finish current step
+          steps[current].classList.remove('active');
+          steps[current].classList.add('done');
+          current++;
+
+          // activate next step if any
+          if (current < totalSteps) {
+            steps[current].classList.add('active');
+          }
+
+          const progress = Math.min((current + 0.2) / totalSteps, 1);
+          progressFill.style.width = (progress * 100) + '%';
+        } else {
+          // all steps done
+          clearInterval(interval);
+
+          if (loadingSubtitle) {
+            loadingSubtitle.textContent = 'All steps complete. Preparing your report…';
+          }
+          if (loadingTip) {
+            loadingTip.textContent = 'Loading, please wait… Loading, please wait…';
+            loadingTip.classList.add('loading-pulse');
+          }
+
+          // tiny delay so user sees the final state, then actually submit
+          setTimeout(() => {
+            form.submit();
+          }, 700);
+        }
+      }, stepDuration);
+    });
+  })();
+</script>
+
+</body>
+</html>

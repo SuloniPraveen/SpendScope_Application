@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SpendScope – Insights</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="page page-result">
+  <div class="bg-gradient"></div>
+
+  <header class="app-header">
+    <div class="app-logo">Spend<span>Scope</span></div>
+    <div class="app-subtitle">Smart spending overview &amp; recommendations</div>
+  </header>
+
+  <main class="app-main app-main-result">
+
+    <!-- TOP: summary + top categories -->
+    <section class="layout-top">
+      <!-- Summary Cards -->
+      <div class="summary-grid">
+        <div class="card summary-card">
+          <div class="card-label">Total Debits</div>
+          <div class="card-value negative">
+            <span class="currency">{{ currency_symbol }}</span>{{ "{:,.2f}".format(summary.total_debit) }}
+          </div>
+        </div>
+        <div class="card summary-card">
+          <div class="card-label">Total Credits</div>
+          <div class="card-value positive">
+            <span class="currency">{{ currency_symbol }}</span>{{ "{:,.2f}".format(summary.total_credit) }}
+          </div>
+        </div>
+        <div class="card summary-card">
+          <div class="card-label">Period Covered</div>
+          <div class="card-value small">
+            {{ summary.start_date }} → {{ summary.end_date }}
+          </div>
+          <div class="card-meta">{{ summary.days_covered }} days</div>
+        </div>
+        <div class="card summary-card">
+          <div class="card-label">Avg Daily Spend</div>
+          <div class="card-value">
+            <span class="currency">{{ currency_symbol }}</span>{{ "{:,.2f}".format(summary.avg_daily_spend) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Categories -->
+      <div class="card card-top-categories">
+        <h2>Where you spend the most</h2>
+        {% if top_categories %}
+          <ul class="category-list">
+            {% for cat, amt in top_categories[:6] %}
+              <li>
+                <div class="cat-name">{{ cat }}</div>
+                <div class="cat-amount">
+                  <span class="currency">{{ currency_symbol }}</span>{{ "{:,.2f}".format(amt) }}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">No category breakdown available.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- CHARTS (stacked) -->
+    <section class="layout-charts">
+      <div class="card chart-card">
+        <h2>Spending by Category</h2>
+        {% if category_chart %}
+          <img src="{{ category_chart }}" alt="Spending by Category chart">
+        {% else %}
+          <p class="muted">Not enough data to build this chart.</p>
+        {% endif %}
+      </div>
+
+      <div class="card chart-card">
+        <h2>Monthly Spending</h2>
+        {% if monthly_chart %}
+          <img src="{{ monthly_chart }}" alt="Monthly Spending chart">
+        {% else %}
+          <p class="muted">Not enough data to build this chart.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- RECOMMENDATIONS -->
+    <section class="layout-bottom">
+      <div class="card rec-card">
+        <h2>AI Recommendations</h2>
+        <p class="muted rec-intro">
+          These suggestions are generated from your current statement’s data. Use the chatbot on the right
+          to dig deeper into categories, merchants, patterns, and specific questions.
+        </p>
+
+        {% if recommendations %}
+          <div class="rec-grid">
+            {% for rec in recommendations %}
+              <article class="rec-item">
+                <div class="rec-icon">
+                  {% if rec.focus == 'savings' %}
+                    💰
+                  {% elif rec.focus == 'debt' %}
+                    📉
+                  {% elif rec.focus == 'subscriptions' %}
+                    🔁
+                  {% elif rec.focus == 'spending' %}
+                    🎯
+                  {% else %}
+                    💡
+                  {% endif %}
+                </div>
+                <div class="rec-body">
+                  <div class="rec-title">{{ rec.title }}</div>
+                  <div class="rec-text">
+                    {{ rec.summary or rec.detail or rec.title }}
+                  </div>
+
+                  <div class="rec-tags">
+                    <button type="button" class="rec-tag rec-tag-action">
+                      Mark as to-do
+                    </button>
+
+                    {% if rec.focus == 'savings' %}
+                      <span class="rec-tag rec-tag-green">Savings</span>
+                    {% elif rec.focus == 'debt' %}
+                      <span class="rec-tag rec-tag-amber">Debt</span>
+                    {% elif rec.focus == 'subscriptions' %}
+                      <span class="rec-tag rec-tag-purple">Recurring</span>
+                    {% elif rec.focus == 'spending' %}
+                      <span class="rec-tag rec-tag-blue">Spending</span>
+                    {% else %}
+                      <span class="rec-tag">General</span>
+                    {% endif %}
+                  </div>
+
+                  {% if rec.detail %}
+                    <div class="rec-footer">
+                      <button type="button" class="rec-toggle">View details</button>
+                    </div>
+                    <div class="rec-detail">
+                      {{ rec.detail }}
+                    </div>
+                  {% endif %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="muted">No recommendations available.</p>
+        {% endif %}
+
+        {% if other_breakdown %}
+          <div class="other-breakdown">
+            <h3>What “Other” includes</h3>
+            <p class="muted">
+              These are the main descriptions that fall under the <strong>Other</strong> category:
+            </p>
+            <ul class="other-list">
+              {% for item in other_breakdown %}
+                <li>
+                  <span class="other-desc">{{ item.description }}</span>
+                  <span class="other-amt">
+                    <span class="currency">{{ currency_symbol }}</span>{{ "{:,.2f}".format(item.amount) }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- NEXT ACTIONS -->
+    <section class="layout-actions">
+      <div class="card actions-card">
+        <h2>Next actions</h2>
+        <p class="muted">
+          Upload another statement or revisit this dashboard to track how your spending patterns change over time.
+        </p>
+        <div class="actions-row">
+          <a href="{{ url_for('index') }}" class="btn-secondary">Analyze another statement</a>
+          <button class="btn-ghost" disabled title="Coming soon">Export report (coming soon)</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SIDE CHATBOT PANEL -->
+  <aside class="chat-floating">
+    <div class="chat-assistant">
+      <div class="chat-header">
+        <div class="chat-title">SpendScope AI</div>
+        <div class="chat-subtitle">
+          Ask questions while you browse your report:
+          <span class="chat-chip">“Where was most of my shopping done?”</span>
+          <span class="chat-chip">“Which month did I spend the most?”</span>
+          <span class="chat-chip">“Any recurring charges?”</span>
+        </div>
+      </div>
+
+      <div class="chat-window" id="chat-window">
+        <div class="chat-message chat-message-ai">
+          Hi! I’m your SpendScope assistant. I can look at your categories, monthly trends,
+          and individual transactions to explain patterns, where your money went, and ideas to improve.
+        </div>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <input
+          id="chat-input"
+          type="text"
+          class="chat-input"
+          placeholder="Ask about categories, merchants, months, biggest spends, patterns…"
+          autocomplete="off"
+          required
+        />
+        <button type="submit" class="btn-primary chat-submit">Ask</button>
+      </form>
+      <div class="chat-hint" id="chat-hint">
+        I only see data from this statement. I can’t access anything else from your account.
+      </div>
+    </div>
+  </aside>
+
+  <!-- Pass dashboard data to JS for chat -->
+  <script>
+    const DASHBOARD_DATA = JSON.parse(`{{ dashboard | tojson | safe }}`);
+  </script>
+
+  <script>
+    // Expand / collapse recommendation details + mark as done
+    (function () {
+      const items = document.querySelectorAll('.rec-item');
+      items.forEach(item => {
+        const toggle = item.querySelector('.rec-toggle');
+        const detail = item.querySelector('.rec-detail');
+        const actionTag = item.querySelector('.rec-tag-action');
+
+        if (toggle && detail) {
+          detail.style.display = 'none';
+
+          toggle.addEventListener('click', () => {
+            const isOpen = item.classList.toggle('open');
+            detail.style.display = isOpen ? 'block' : 'none';
+            toggle.textContent = isOpen ? 'Hide details' : 'View details';
+          });
+        }
+
+        if (actionTag) {
+          actionTag.addEventListener('click', () => {
+            const isDone = item.classList.toggle('rec-done');
+            if (isDone) {
+              actionTag.textContent = 'Marked as done';
+            } else {
+              actionTag.textContent = 'Mark as to-do';
+            }
+          });
+        }
+      });
+    })();
+
+    // Chat assistant behaviour
+    (function () {
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const chatWindow = document.getElementById('chat-window');
+      const chatHint = document.getElementById('chat-hint');
+      if (!chatForm || !chatInput || !chatWindow) return;
+
+      let isSending = false;
+
+      function appendMessage(role, text, isThinking = false) {
+        const msg = document.createElement('div');
+        msg.classList.add('chat-message');
+        msg.classList.add(role === 'user' ? 'chat-message-user' : 'chat-message-ai');
+        if (isThinking) msg.classList.add('chat-message-thinking');
+        msg.textContent = text;
+        chatWindow.appendChild(msg);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return msg;
+      }
+
+      chatForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const q = chatInput.value.trim();
+        if (!q || isSending) return;
+
+        appendMessage('user', q);
+        chatInput.value = '';
+        isSending = true;
+        if (chatHint) {
+          chatHint.textContent = 'Talking to SpendScope AI…';
+        }
+
+        const thinkingMsg = appendMessage('ai', 'Thinking…', true);
+
+        fetch('{{ url_for("chat") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            question: q,
+            dashboard: DASHBOARD_DATA
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          thinkingMsg.remove();
+          if (data && data.answer) {
+            appendMessage('ai', data.answer);
+          } else {
+            appendMessage('ai', data.error || 'Sorry, I could not answer that right now.');
+          }
+        })
+        .catch(() => {
+          thinkingMsg.remove();
+          appendMessage('ai', 'Something went wrong while contacting the AI. Please try again.');
+        })
+        .finally(() => {
+          isSending = false;
+          if (chatHint) {
+            chatHint.textContent = 'I only see data from this statement. I can’t access anything else from your account.';
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
