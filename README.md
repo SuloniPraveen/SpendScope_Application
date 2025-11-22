@@ -6,12 +6,7 @@ SpendScope is an intelligent personal finance tool that reads bank statements, e
 
 ## 🎥 Demo Video
 
-<video
-src="https://drive.google.com/file/d/1LaEJCW2ZQbzy98E2K03e5OtBvz5ZIuKa/view?usp=sharing"
-controls
-width="600"
-
-> </video>
+<video src="demo.mov" controls width="600"></video>
 
 ## ✨ Key Features ### 🔍 Automated Statement Parsing - Upload any PDF bank
 
