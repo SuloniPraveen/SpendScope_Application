@@ -4,32 +4,61 @@ SpendScope is an intelligent personal finance tool that reads bank statements, e
 
 ---
 
-## 🎥 Demo Video
+## ✨ Key Features
 
-<video src="demo.mov" controls width="600"></video>
+### 🔍 Automated Statement Parsing
 
-## ✨ Key Features ### 🔍 Automated Statement Parsing - Upload any PDF bank
+- Upload any PDF bank statement
+- System extracts dates, amounts, categories, balance trends, and recurring expenses
 
-statement - System extracts dates, amounts, categories, balance trends, and
-recurring expenses ### 📊 Spending Visualizations - Bar graphs, line charts,
-heatmaps - Category-wise spending breakdown - Cash flow trend analysis - Highest
-spenders / recurring debit detection ### 🤖 Smart AI Chatbot - Get personalized
-recommendations - Ask questions like _“Where do I spend the most?”_ or _“How can
-I save more?”_ - AI summarizes your finances in simple, easy-to-read language
+### 📊 Spending Visualizations
 
-### 📈 Behavioral Insights - Detects overspending patterns - Identifies
+- Bar graphs, line charts, heatmaps
+- Category-wise spending breakdown
+- Cash flow trend analysis
+- Highest spenders / recurring debit detection
 
-recurring bills & EMIs - Highlights financial risks - Provides actionable tips
+### 🤖 Smart AI Chatbot
 
-### ⏳ Progress Tracker - Real-time progress stages - Smooth transitions -
+- Get personalized recommendations
+- Ask questions like _“Where do I spend the most?”_ or _“How can I save more?”_
+- AI summarizes your finances in simple, easy-to-read language
 
-Displays _“Loading… please wait”_ until analysis completes --- # 🛠 Tech Stack -
-**Python** - **Flask** - **pdfplumber** - **pandas** - **matplotlib** - **HTML +
-CSS** - **OpenAI API** --- # 📥 Installation & Setup Guide ## 1. Clone the
-Repository ```bash git clone https://github.com/yourusername/spendscope.git cd
-spendscope
+### 📈 Behavioral Insights
 
-````
+- Detects overspending patterns
+- Identifies recurring bills & EMIs
+- Highlights financial risks
+- Provides actionable tips
+
+### ⏳ Progress Tracker
+
+- Real-time progress stages
+- Smooth transitions
+- Displays _“Loading… please wait”_ until analysis completes
+
+---
+
+# 🛠 Tech Stack
+
+- **Python**
+- **Flask**
+- **pdfplumber**
+- **pandas**
+- **matplotlib**
+- **HTML + CSS**
+- **OpenAI API**
+
+---
+
+# 📥 Installation & Setup Guide
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/spendscope.git
+cd spendscope
+```
 
 ## 2. Create Virtual Environment
 
@@ -97,4 +126,3 @@ http://127.0.0.1:5000
 - Mobile UI version
 
 ---
-````
