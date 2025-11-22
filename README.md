@@ -2,7 +2,7 @@
 
 SpendScope is an intelligent personal finance tool that reads bank statements, extracts transaction details, visualizes spending patterns, and generates personalized financial insights through an AI chatbot. It combines **PDF parsing**, **data analytics**, **interactive visualizations**, and an **AI recommendation engine** into one seamless application—helping users understand their financial behavior instantly.
 
-[![SpendScope Demo](assets/demo-thumbnail.png)](https://drive.google.com/file/d/1LaEJCW2ZQbzy98E2K03e5OtBvz5ZIuKa/view?usp=share_link)
+[![SpendScope Demo](assets/Thumbnail.png)](https://drive.google.com/file/d/1LaEJCW2ZQbzy98E2K03e5OtBvz5ZIuKa/view?usp=share_link)
 
 [![Demo Video](https://img.shields.io/badge/Watch-Demo-blue?style=for-the-badge)](https://drive.google.com/file/d/1LaEJCW2ZQbzy98E2K03e5OtBvz5ZIuKa/view?usp=share_link)
 
